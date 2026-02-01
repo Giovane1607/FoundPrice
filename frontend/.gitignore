@@ -59,3 +59,11 @@ __pycache__/
 foundprice.db
 .angular/
 dist/
+
+backend/.env
+backend/venv/
+backend/__pycache__/
+backend/foundprice.db
+frontend/node_modules/
+frontend/.angular/
+frontend/dist/
