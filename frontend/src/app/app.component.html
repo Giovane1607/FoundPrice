@@ -1,0 +1,72 @@
+<div class="main-container" [class.dark-theme]="isDarkMode">
+  <button class="dark-mode-toggle" (click)="toggleDarkMode()">{{ isDarkMode ? '☀️' : '🌙' }}</button>
+  
+  <h1>Found<span>Price</span> 🎮</h1>
+  
+  <div class="search-bar">
+    <input type="text" [(ngModel)]="query" (keyup.enter)="buscar()" placeholder="O que você procura?">
+    <button (click)="buscar()" [disabled]="carregando">
+      {{ carregando ? 'Buscando...' : 'Analisar' }}
+    </button>
+  </div>
+
+  <table class="price-table" *ngIf="resultados.length > 0 && !carregando">
+    <thead>
+      <tr>
+        <th>Status</th>
+        <th>Loja</th>
+        <th>Produto</th>
+        <th>Preço</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of resultados">
+        <td>
+          <span [ngClass]="p.confiavel ? 'status-ok' : 'status-warning'">
+            {{ p.confiavel ? '✔ Seguro' : '⚠ Risco' }}
+          </span>
+        </td>
+        <td>{{ p.source }}</td>
+        <td>{{ p.title }}</td>
+        <td class="price-cell">{{ p.price | currency:'BRL' }}</td>
+        <td class="acoes">
+          <button class="btn-abrir" (click)="abrirLink(p.link)">Ir para Loja</button>
+          <button class="btn-analise" (click)="analisarPrecos(p.title)">📊 Preços</button>
+          <button class="btn-vendas" (click)="compararMercado(p.title)">🤝 Comparação</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="modal" *ngIf="exibirModal" (click)="exibirModal = false">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <span class="close" (click)="exibirModal = false">&times;</span>
+      <h3>Variação por Loja</h3>
+      <div class="chart-container">
+        <canvas id="graficoPrecos"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" *ngIf="exibirModalVendas" (click)="exibirModalVendas = false">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <span class="close" (click)="exibirModalVendas = false">&times;</span>
+      <h3>🛡️ Validador de Mercado</h3>
+      <div class="stats-grid" *ngIf="dadosVendas">
+        <div class="stat-card">
+          <label>Preço Médio de Compra:</label>
+          <p><strong>{{ dadosVendas.media_mercado | currency:'BRL' }}</strong></p>
+        </div>
+        <div class="stat-card highlight">
+          <label>Menor Preço Legítimo:</label>
+          <p>{{ dadosVendas.menor_legitimo | currency:'BRL' }}</p>
+        </div>
+      </div>
+      <div class="alerta-golpe" *ngIf="dadosVendas?.alerta_golpe">
+        ⚠️ <strong>Risco Detectado:</strong> Existem ofertas com preços irreais no mercado. 
+        O "Menor Preço Legítimo" acima ignora valores suspeitos de golpe.
+      </div>
+    </div>
+  </div>
+</div>
