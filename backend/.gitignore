@@ -1,0 +1,15 @@
+# Variáveis de ambiente - NUNCA commitar!
+.env
+
+# Banco de dados local
+*.db
+foundprice.db
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment
+venv/
+env/

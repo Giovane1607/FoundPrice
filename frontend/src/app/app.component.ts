@@ -3,6 +3,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Chart, registerables } from 'chart.js';
+import { environment } from '../environments/environment';
 
 // Registrar os módulos do Chart.js
 Chart.register(...registerables);
@@ -40,7 +41,7 @@ export class AppComponent {
     this.carregando = true;
     
     // Busca inicial na API de produtos
-    this.http.get<any[]>(`http://localhost:8000/api/search?q=${this.query}`)
+    this.http.get<any[]>(`${environment.apiUrl}/api/search?q=${this.query}`)
       .subscribe({
         next: (res) => {
           this.resultados = res;
@@ -65,7 +66,7 @@ export class AppComponent {
   analisarPrecos(nome: string) {
     this.exibirModal = true; // Abre o modal para o Canvas existir no DOM
     
-    this.http.get(`http://localhost:8000/api/analise-produto?q=${nome}`)
+    this.http.get(`${environment.apiUrl}/api/analise-produto?q=${nome}`)
       .subscribe({
         next: (res: any) => {
           console.log('Dados para o gráfico:', res);
@@ -81,7 +82,7 @@ export class AppComponent {
   // Lógica do Botão "🤝 Comparação"
   compararMercado(nome: string) {
     this.exibirModalVendas = true;
-    this.http.get(`http://localhost:8000/api/comparar-vendas?q=${nome}`)
+    this.http.get(`${environment.apiUrl}/api/comparar-vendas?q=${nome}`)
       .subscribe({
         next: (res: any) => {
           this.dadosVendas = res;

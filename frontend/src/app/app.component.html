@@ -1,72 +1,192 @@
 <div class="main-container" [class.dark-theme]="isDarkMode">
-  <button class="dark-mode-toggle" (click)="toggleDarkMode()">{{ isDarkMode ? '☀️' : '🌙' }}</button>
+  <!-- Toggle Dark Mode com Ícones -->
+  <button class="dark-mode-toggle" (click)="toggleDarkMode()">
+    <i [class]="isDarkMode ? 'fas fa-sun' : 'fas fa-moon'"></i>
+    <span>{{ isDarkMode ? 'Claro' : 'Escuro' }}</span>
+  </button>
   
-  <h1>Found<span>Price</span> 🎮</h1>
+  <!-- Header com Animação -->
+  <header>
+    <div class="logo-container">
+      <i class="fas fa-search-dollar logo-icon"></i>
+      <h1>Found<span>Price</span></h1>
+    </div>
+    <p class="subtitle">
+      <i class="fas fa-shield-alt"></i> 
+      Encontre as melhores ofertas com segurança
+    </p>
+  </header>
   
-  <div class="search-bar">
-    <input type="text" [(ngModel)]="query" (keyup.enter)="buscar()" placeholder="O que você procura?">
-    <button (click)="buscar()" [disabled]="carregando">
-      {{ carregando ? 'Buscando...' : 'Analisar' }}
-    </button>
+  <!-- Barra de Busca Melhorada -->
+  <div class="search-section">
+    <div class="search-bar">
+      <i class="fas fa-search search-icon"></i>
+      <input 
+        type="text" 
+        [(ngModel)]="query" 
+        (keyup.enter)="buscar()" 
+        placeholder="Ex: iPhone 15, PlayStation 5, MacBook Pro..."
+        [disabled]="carregando"
+      >
+      <button (click)="buscar()" [disabled]="carregando" class="btn-search">
+        <i [class]="carregando ? 'fas fa-spinner fa-spin' : 'fas fa-chart-line'"></i>
+        {{ carregando ? 'Buscando...' : 'Analisar' }}
+      </button>
+    </div>
+    
+    <!-- Sugestões populares -->
+    <div class="search-suggestions" *ngIf="!carregando && resultados.length === 0">
+      <p class="suggestions-label">
+        <i class="fas fa-fire"></i> Buscas populares:
+      </p>
+      <div class="suggestion-tags">
+        <button class="tag" (click)="query = 'iPhone 15'; buscar()">iPhone 15</button>
+        <button class="tag" (click)="query = 'PlayStation 5'; buscar()">PlayStation 5</button>
+        <button class="tag" (click)="query = 'Samsung Galaxy S24'; buscar()">Galaxy S24</button>
+        <button class="tag" (click)="query = 'Notebook Gamer'; buscar()">Notebook Gamer</button>
+      </div>
+    </div>
   </div>
 
-  <table class="price-table" *ngIf="resultados.length > 0 && !carregando">
-    <thead>
-      <tr>
-        <th>Status</th>
-        <th>Loja</th>
-        <th>Produto</th>
-        <th>Preço</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let p of resultados">
-        <td>
-          <span [ngClass]="p.confiavel ? 'status-ok' : 'status-warning'">
-            {{ p.confiavel ? '✔ Seguro' : '⚠ Risco' }}
-          </span>
-        </td>
-        <td>{{ p.source }}</td>
-        <td>{{ p.title }}</td>
-        <td class="price-cell">{{ p.price | currency:'BRL' }}</td>
-        <td class="acoes">
-          <button class="btn-abrir" (click)="abrirLink(p.link)">Ir para Loja</button>
-          <button class="btn-analise" (click)="analisarPrecos(p.title)">📊 Preços</button>
-          <button class="btn-vendas" (click)="compararMercado(p.title)">🤝 Comparação</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="carregando">
+    <div class="loading-spinner">
+      <i class="fas fa-circle-notch fa-spin"></i>
+    </div>
+    <p class="loading-text">Comparando preços em dezenas de lojas...</p>
+    <div class="loading-dots">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
 
+  <!-- Resultados -->
+  <div class="results-section" *ngIf="resultados.length > 0 && !carregando">
+    <!-- Stats Header -->
+    <div class="results-header">
+      <div class="results-count">
+        <i class="fas fa-store"></i>
+        <span>{{ resultados.length }} ofertas encontradas</span>
+      </div>
+      <div class="results-filters">
+        <i class="fas fa-filter"></i>
+        <span>Ordenado por confiabilidade</span>
+      </div>
+    </div>
+
+    <!-- Tabela Melhorada -->
+    <div class="table-container">
+      <table class="price-table">
+        <thead>
+          <tr>
+            <th><i class="fas fa-shield-alt"></i> Status</th>
+            <th><i class="fas fa-store"></i> Loja</th>
+            <th><i class="fas fa-box"></i> Produto</th>
+            <th><i class="fas fa-tag"></i> Preço</th>
+            <th><i class="fas fa-cog"></i> Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of resultados; let i = index" [style.animation-delay]="i * 0.05 + 's'">
+            <td class="status-cell">
+              <span [ngClass]="p.confiavel ? 'status-seguro' : 'status-risco'">
+                <i [class]="p.confiavel ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle'"></i>
+                {{ p.confiavel ? 'Seguro' : 'Atenção' }}
+              </span>
+            </td>
+            <td class="store-name">
+              <i class="fas fa-shopping-bag"></i>
+              {{ p.source }}
+            </td>
+            <td class="product-title" [title]="p.title">{{ p.title }}</td>
+            <td class="price-cell">
+              <i class="fas fa-dollar-sign"></i>
+              {{ p.price | currency:'BRL' }}
+            </td>
+            <td class="acoes">
+              <button class="btn-abrir" (click)="abrirLink(p.link)" title="Abrir loja">
+                <i class="fas fa-external-link-alt"></i>
+                <span>Loja</span>
+              </button>
+              <button class="btn-analise" (click)="analisarPrecos(p.title)" title="Ver histórico">
+                <i class="fas fa-chart-line"></i>
+                <span>Histórico</span>
+              </button>
+              <button class="btn-vendas" (click)="compararMercado(p.title)" title="Validar preço">
+                <i class="fas fa-check-double"></i>
+                <span>Validar</span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!carregando && resultados.length === 0 && query">
+    <i class="fas fa-search empty-icon"></i>
+    <h3>Nenhum resultado encontrado</h3>
+    <p>Tente pesquisar com termos diferentes ou mais genéricos</p>
+  </div>
+
+  <!-- Modal Histórico -->
   <div class="modal" *ngIf="exibirModal" (click)="exibirModal = false">
     <div class="modal-content" (click)="$event.stopPropagation()">
-      <span class="close" (click)="exibirModal = false">&times;</span>
-      <h3>Variação por Loja</h3>
+      <button class="modal-close" (click)="exibirModal = false">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="modal-header">
+        <i class="fas fa-chart-line modal-icon"></i>
+        <h3>Histórico de Preços</h3>
+      </div>
       <div class="chart-container">
         <canvas id="graficoPrecos"></canvas>
       </div>
+      <div class="modal-footer">
+        <i class="fas fa-info-circle"></i>
+        <p>Baseado em buscas anteriores</p>
+      </div>
     </div>
   </div>
 
+  <!-- Modal Validação -->
   <div class="modal" *ngIf="exibirModalVendas" (click)="exibirModalVendas = false">
     <div class="modal-content" (click)="$event.stopPropagation()">
-      <span class="close" (click)="exibirModalVendas = false">&times;</span>
-      <h3>🛡️ Validador de Mercado</h3>
+      <button class="modal-close" (click)="exibirModalVendas = false">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="modal-header">
+        <i class="fas fa-check-double modal-icon"></i>
+        <h3>Validador de Mercado</h3>
+      </div>
       <div class="stats-grid" *ngIf="dadosVendas">
         <div class="stat-card">
-          <label>Preço Médio de Compra:</label>
-          <p><strong>{{ dadosVendas.media_mercado | currency:'BRL' }}</strong></p>
+          <i class="fas fa-balance-scale stat-icon"></i>
+          <label>Média de Mercado</label>
+          <p class="stat-value">{{ dadosVendas.media_mercado | currency:'BRL' }}</p>
         </div>
-        <div class="stat-card highlight">
-          <label>Menor Preço Legítimo:</label>
-          <p>{{ dadosVendas.menor_legitimo | currency:'BRL' }}</p>
+        <div class="stat-card">
+          <i class="fas fa-thumbs-up stat-icon"></i>
+          <label>Menor Preço Legítimo</label>
+          <p class="stat-value success">{{ dadosVendas.menor_legitimo | currency:'BRL' }}</p>
         </div>
       </div>
       <div class="alerta-golpe" *ngIf="dadosVendas?.alerta_golpe">
-        ⚠️ <strong>Risco Detectado:</strong> Existem ofertas com preços irreais no mercado. 
-        O "Menor Preço Legítimo" acima ignora valores suspeitos de golpe.
+        <i class="fas fa-exclamation-triangle"></i>
+        <strong>Atenção!</strong> Ofertas suspeitas foram detectadas e filtradas desta análise.
+      </div>
+      <div class="modal-footer">
+        <i class="fas fa-shield-alt"></i>
+        <p>Compre sempre em lojas confiáveis</p>
       </div>
     </div>
   </div>
+
+  <!-- Footer -->
+  <footer class="app-footer" *ngIf="!carregando">
+    <p>
+      <i class="fas fa-heart"></i>
+      Desenvolvido para ajudar você a economizar
+    </p>
+  </footer>
 </div>
