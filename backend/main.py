@@ -15,6 +15,7 @@ app.add_middleware(
     allow_origins=[
         "https://foundprice.com.br",
         "https://www.foundprice.com.br",
+        "https://api.foundprice.com.br",  # URL da API
         "https://foundprice-frontend.onrender.com",  # URL do Render
         "http://localhost:4200"  # Para testes locais
     ],
@@ -22,6 +23,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/")
+def health_check():
+    return {"status": "online", "message": "FoundPrice API is running"}
 
 @app.get("/api/search")
 def search(q: str):

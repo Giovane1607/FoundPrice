@@ -136,6 +136,21 @@ https://foundprice-api.onrender.com/docs
 
 ## 🐛 Troubleshooting
 
+### ❌ Erro: "502 Bad Gateway" no Render
+**Causa**: O Render faz um health check na rota `/` e recebe 404, marcando o serviço como offline.
+
+**Solução**: O `backend/main.py` já inclui a rota de health check:
+```python
+@app.get("/")
+def health_check():
+    return {"status": "online", "message": "FoundPrice API is running"}
+```
+
+**Verificar**:
+1. Confirme que o Start Command está correto: `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`
+2. Após o deploy, teste: `curl https://SEU-BACKEND.onrender.com/`
+3. Deve retornar: `{"status":"online","message":"FoundPrice API is running"}`
+
 ### ❌ Erro: "Loopback to localhost" ou "ERR_FAILED"
 **Causa**: O frontend em produção está tentando acessar `http://localhost:8000`.
 
