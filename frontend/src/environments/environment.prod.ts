@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://foundprice-backend.onrender.com'
+  apiUrl: 'https://api.foundprice.com.br'
 };

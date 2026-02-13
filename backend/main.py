@@ -15,6 +15,7 @@ app.add_middleware(
     allow_origins=[
         "https://foundprice.com.br",
         "https://www.foundprice.com.br",
+        "https://foundprice-frontend.onrender.com",  # URL do Render
         "http://localhost:4200"  # Para testes locais
     ],
     allow_credentials=True,

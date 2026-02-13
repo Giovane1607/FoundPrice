@@ -68,14 +68,49 @@ Na seção **Environment Variables**, adicione:
 
 ## 🔧 Configurar Frontend
 
-Atualize o arquivo `frontend/src/environments/environment.prod.ts`:
+### ⚠️ IMPORTANTE: Garantir Build de Produção
 
+O erro mais comum é o frontend usar `localhost` em produção. Para evitar isso:
+
+**1. Verifique os arquivos de ambiente:**
+
+`frontend/src/environments/environment.ts` (desenvolvimento):
+```typescript
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:8000'
+};
+```
+
+`frontend/src/environments/environment.prod.ts` (produção):
 ```typescript
 export const environment = {
   production: true,
-  apiUrl: 'https://foundprice-api.onrender.com'
+  apiUrl: 'https://api.foundprice.com.br'
 };
 ```
+
+**2. Configure o `angular.json` para usar fileReplacements:**
+
+O arquivo já está configurado, mas verifique se a seção `production` tem:
+```json
+"fileReplacements": [
+  {
+    "replace": "src/environments/environment.ts",
+    "with": "src/environments/environment.prod.ts"
+  }
+]
+```
+
+**3. No `package.json`, o comando build deve ser:**
+```json
+"build": "ng build --configuration production"
+```
+
+**4. No painel do Render (Frontend Service):**
+- **Build Command**: `cd frontend && npm install && npm run build`
+- **Publish Directory**: `frontend/dist/frontend/browser`
+- ⚠️ **REMOVA** qualquer variável de ambiente `API_URL` que tenha sido adicionada
 
 ---
 
@@ -101,6 +136,35 @@ https://foundprice-api.onrender.com/docs
 
 ## 🐛 Troubleshooting
 
+### ❌ Erro: "Loopback to localhost" ou "ERR_FAILED"
+**Causa**: O frontend em produção está tentando acessar `http://localhost:8000`.
+
+**Solução**:
+1. Verifique se o build está usando `--configuration production`
+2. Confirme que `environment.prod.ts` tem a URL correta do backend
+3. No Render, remova qualquer variável `API_URL` do serviço frontend
+4. Force um rebuild no Render após fazer as correções
+5. Limpe o cache do navegador (Ctrl+Shift+Delete)
+
+### ❌ Erro: "Access to XMLHttpRequest blocked by CORS"
+**Causa**: O backend não está aceitando requisições do seu domínio frontend.
+
+**Solução**: Verifique `backend/main.py`:
+```python
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://foundprice.com.br",
+        "https://www.foundprice.com.br",
+        "https://foundprice-frontend.onrender.com",
+        "http://localhost:4200"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+```
+
 ### ❌ Erro: "Module not found"
 **Solução**: Verifique se os imports estão no formato:
 ```python
@@ -120,17 +184,6 @@ uvicorn backend.main:app --host 0.0.0.0 --port $PORT
 engine = create_engine(
     "sqlite:///./foundprice.db", 
     connect_args={"check_same_thread": False, "timeout": 30}
-)
-```
-
-### ❌ CORS Error no Frontend
-**Solução**: Verifique `backend/main.py`:
-```python
-app.add_middleware(
-    CORSMiddleware, 
-    allow_origins=["*"],  # Em produção, especifique o domínio
-    allow_methods=["*"], 
-    allow_headers=["*"]
 )
 ```
 
