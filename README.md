@@ -71,17 +71,29 @@ npm install
 
 ## ▶️ Como Rodar
 
-### Backend
+### **Backend (Local)**
 
-No diretório `backend` (com o ambiente virtual ativado):
-
+**Opção 1 - Rodar do diretório raiz (Recomendado para Render):**
 ```bash
+# Ative o ambiente virtual
+.\venv\Scripts\activate   # Windows
+# ou
+source venv/bin/activate  # Linux/Mac
+
+# Rode o backend
+uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+**Opção 2 - Rodar de dentro da pasta backend:**
+```bash
+cd backend
+.\venv\Scripts\activate   # Windows
 uvicorn main:app --reload
 ```
 
 O backend estará rodando em: **http://localhost:8000**
 
-### Frontend
+### **Frontend**
 
 Em outro terminal, no diretório `frontend`:
 
@@ -90,6 +102,27 @@ npm start
 ```
 
 O frontend estará rodando em: **http://localhost:4200**
+
+---
+
+## 🚀 Deploy no Render
+
+### **Backend**
+
+1. Faça push do código para o GitHub
+2. No Render, crie um novo Web Service
+3. Conecte seu repositório
+4. Configure:
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`
+5. Adicione a variável de ambiente:
+   - `SERP_API_KEY`: sua_chave_serpapi
+
+O arquivo `render.yaml` já está configurado para deploy automático!
+
+### **Frontend**
+
+Pode ser hospedado no Vercel, Netlify ou Render Static Site.
 
 ---
 
