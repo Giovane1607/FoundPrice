@@ -10,7 +10,17 @@ load_dotenv()
 init_db()
 app = FastAPI()
 
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://foundprice.com.br",
+        "https://www.foundprice.com.br",
+        "http://localhost:4200"  # Para testes locais
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/api/search")
 def search(q: str):
