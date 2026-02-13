@@ -1,4 +1,4 @@
-from database import SessionLocal, HistoricoPreco
+from backend.database import SessionLocal, HistoricoPreco
 from datetime import datetime
 
 def salvar_historico(resultados):
