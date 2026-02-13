@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 import requests
 import os
 from dotenv import load_dotenv
-import database_utils as dbu
-from database import init_db
+from backend import database_utils as dbu
+from backend.database import init_db
 
 load_dotenv()
 init_db()

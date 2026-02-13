@@ -87,22 +87,22 @@
         </thead>
         <tbody>
           <tr *ngFor="let p of resultados; let i = index" [style.animation-delay]="i * 0.05 + 's'">
-            <td class="status-cell">
+            <td class="status-cell" data-label="Status">
               <span [ngClass]="p.confiavel ? 'status-seguro' : 'status-risco'">
                 <i [class]="p.confiavel ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle'"></i>
                 {{ p.confiavel ? 'Seguro' : 'Atenção' }}
               </span>
             </td>
-            <td class="store-name">
+            <td class="store-name" data-label="Loja">
               <i class="fas fa-shopping-bag"></i>
               {{ p.source }}
             </td>
-            <td class="product-title" [title]="p.title">{{ p.title }}</td>
-            <td class="price-cell">
-              <i class="fas fa-dollar-sign"></i>
+            <td class="product-title" data-label="Produto" [title]="p.title">{{ p.title }}</td>
+            <td class="price-cell" data-label="Preço">
+              <i class="fas fa-tag"></i>
               {{ p.price | currency:'BRL' }}
             </td>
-            <td class="acoes">
+            <td class="acoes" data-label="Ações">
               <button class="btn-abrir" (click)="abrirLink(p.link)" title="Abrir loja">
                 <i class="fas fa-external-link-alt"></i>
                 <span>Loja</span>
@@ -124,9 +124,13 @@
 
   <!-- Empty State -->
   <div class="empty-state" *ngIf="!carregando && resultados.length === 0 && query">
-    <i class="fas fa-search empty-icon"></i>
+    <i class="fas fa-box-open empty-icon"></i>
     <h3>Nenhum resultado encontrado</h3>
     <p>Tente pesquisar com termos diferentes ou mais genéricos</p>
+    <button class="btn-back" (click)="query = ''; resultados = []">
+      <i class="fas fa-arrow-left"></i>
+      Voltar à busca
+    </button>
   </div>
 
   <!-- Modal Histórico -->
